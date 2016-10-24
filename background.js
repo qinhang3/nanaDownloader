@@ -38,38 +38,50 @@ setInterval(function () {
     chrome.tabs.query({},function(tabs){
         tabCnt = tabs.length;
         // console.log(tabCnt);
+        localStorage["tabs"] = tabCnt;
     });
 },10);
 
-chrome.webRequest.onBeforeRequest.addListener(
+
+
+
+
+chrome.webRequest.onBeforeRedirect.addListener(
     function (info) {
 
-        var tokenLength = "904cdf2b-576d-48a1-9529-ad97d3ed1184".length;
-        var length = info.url.length;
-        var token = info.url.substr(length - tokenLength,tokenLength);
+        if (info.url.indexOf("nanairo.co") == 8 ) {
+            var tokenLength = "904cdf2b-576d-48a1-9529-ad97d3ed1184".length;
+            var length = info.url.length;
+            var token = info.url.substr(length - tokenLength, tokenLength);
+            localStorage["token"] = token;
+            localStorage["oldUrl"] = info.url;
+        } else if (info.url.indexOf("nanairo.co") == 12){
 
-        if (download[token] == undefined){
-            download[token] = "done";
-            var pos = info.url.indexOf(".ts");
-            for (var i = 0;i<225;i++){
-                var newUrl = info.url.substring(0,pos-3) + padLeft(i,3) + info.url.substr(pos);
-
-                while(tabCnt > 10){
-                    console.log("waiting "+tabCnt);
-                }
-
-                tabCnt ++;
-
-                chrome.tabs.create({
-                    url: newUrl,
-                    active: false
-
-                }, function (tab) {
-
-                    // download[info.url] = "done";
-                });
-            }
         }
+
+
+        // if (download[token] == undefined){
+        //     download[token] = "done";
+        //     var pos = info.url.indexOf(".ts");
+        //     for (var i = 0;i<225;i++){
+        //         var newUrl = info.url.substring(0,pos-3) + padLeft(i,3) + info.url.substr(pos);
+        //
+        //         while(tabCnt > 10){
+        //             console.log("waiting "+tabCnt);
+        //         }
+        //
+        //         tabCnt ++;
+        //
+        //         chrome.tabs.create({
+        //             url: newUrl,
+        //             active: false
+        //
+        //         }, function (tab) {
+        //
+        //             // download[info.url] = "done";
+        //         });
+        //     }
+        // }
 
         // if (download[info.url] == undefined) {
         //     // alert("create " + info.url+ " now url = "+tab.url);
@@ -87,7 +99,8 @@ chrome.webRequest.onBeforeRequest.addListener(
     // filters
     {
         urls: [
-            "https://nanairo.co/videos/*.ts*"
+            "https://nanairo.co/videos/*.ts*",
+            "https://api.nanairo.co/v1/user/videos/*"
         ]
         // types: ["other"]
     }
